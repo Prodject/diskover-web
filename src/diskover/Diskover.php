@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (C) Chris Park 2017-2018
+Copyright (C) Chris Park 2017-2019
 diskover is released under the Apache 2.0 license. See
 LICENSE for the full license text.
  */
@@ -12,46 +12,49 @@ use Elasticsearch\ClientBuilder;
 error_reporting(E_ALL ^ E_NOTICE);
 
 // diskover-web version
-$VERSION = '1.5.0-rc29';
+$VERSION = '1.5.0.8';
 
 
 function connectES() {
-  // Connect to Elasticsearch node
-  $esPort = getenv('APP_ES_PORT') ?: Constants::ES_PORT;
-  $esIndex = getenv('APP_ES_INDEX') ?: getCookie('index');
-  $esIndex2 = getenv('APP_ES_INDEX2') ?: getCookie('index2');
-  if (Constants::AWS) {
-    // using AWS
-    if (Constants::AWS_HTTPS) {
-        $scheme = 'https';
+    // Connect to Elasticsearch node
+    $esHost = getenv('APP_ES_HOST') ?: Constants::ES_HOST;
+    $esPort = getenv('APP_ES_PORT') ?: Constants::ES_PORT;
+    $esUser = getenv('APP_ES_USER') ?: Constants::ES_USER;
+    $esPass = getenv('APP_ES_PASS') ?: Constants::ES_PASS;
+    $esIndex = getenv('APP_ES_INDEX') ?: getCookie('index');
+    $esIndex2 = getenv('APP_ES_INDEX2') ?: getCookie('index2');
+    if (Constants::AWS) {
+        // using AWS
+        if (Constants::AWS_HTTPS) {
+            $scheme = 'https';
+        } else {
+            $scheme = 'http';
+        }
+        $hosts = [
+            [ 'host' => $esHost, 'port' => $esPort, 'scheme' => $scheme ]
+        ];
     } else {
-        $scheme = 'http';
+        $hosts = [
+            [ 'host' => $esHost, 'port' => $esPort, 
+            'user' => $esUser, 'pass' => $esPass ]
+            ];
     }
-    $hosts = [
-      [ 'host' => Constants::ES_HOST, 'port' => $esPort, 'scheme' => $scheme ]
-    ];
-  } else {
-  $hosts = [
-      [ 'host' => Constants::ES_HOST, 'port' => $esPort, 
-      'user' => Constants::ES_USER, 'pass' => Constants::ES_PASS ]
-    ];
-  }
 
-  $client = ClientBuilder::create()->setHosts($hosts)->build();
+    $client = ClientBuilder::create()->setHosts($hosts)->build();
 
-  // Check if diskover index exists in Elasticsearch
-  $params = ['index' => $esIndex];
-  $bool_index = $client->indices()->exists($params);
-  $params = ['index' => $esIndex2];
-  $bool_index2 = $client->indices()->exists($params);
-  if ((!$bool_index || !$bool_index2) && basename($_SERVER['PHP_SELF']) !== 'selectindices.php' && explode('/', $_SERVER['PHP_SELF'])[1] !== 'api.php') {
-      deleteCookie('index');
-      deleteCookie('index2');
-      header("Location: /selectindices.php");
-      exit();
-  }
+    $params = ['index' => $esIndex];
+    $bool_index = $client->indices()->exists($params);
+    $params = ['index' => $esIndex2];
+    $bool_index2 = $client->indices()->exists($params);
+    // Check if on select indices or api page and if diskover index exists in Elasticsearch
+    if (strpos($_SERVER['REQUEST_URI'], 'api.php') == false && strpos($_SERVER['REQUEST_URI'], 'selectindices.php') == false && (!$bool_index || !$bool_index2)) {
+        deleteCookie('index');
+        deleteCookie('index2');
+        header("Location: /selectindices.php");
+        exit();
+    }
 
-  return $client;
+    return $client;
 }
 
 
@@ -856,30 +859,14 @@ if (isset($_GET['index'])) {
 } else {
     // get index from env var or cookie
     $esIndex = (!empty(getenv('APP_ES_INDEX'))) ? getenv('APP_ES_INDEX') : getCookie('index');
-    // redirect to select indices page if no index cookie
-    if (empty($esIndex) && basename($_SERVER['PHP_SELF']) !== 'selectindices.php' && explode('/', $_SERVER['PHP_SELF'])[1] !== 'api.php') {
+    // Check if on select indices or api page and redirect to select indices page if no index cookie
+    if (strpos($_SERVER['REQUEST_URI'], 'api.php') == false && strpos($_SERVER['REQUEST_URI'], 'selectindices.php') == false && empty($esIndex)) {
         header("location:selectindices.php");
         exit();
     }
 }
 
 if (basename($_SERVER['PHP_SELF']) !== 'selectindices.php') {
-    // check for Qumulo index
-    if (strpos($esIndex, 'diskover_qumulo-') !== false) {
-        createCookie('qumulo', 1);
-        $qumulo_index = 1;
-    } else {
-        createCookie('qumulo', 0);
-        $qumulo_index = 0;
-    }
-    // check for AWS S3 index
-    if (strpos($esIndex, 'diskover_s3-') !== false) {
-        createCookie('s3', 1);
-        $s3_index = 1;
-    } else {
-        createCookie('s3', 0);
-        $s3_index = 0;
-    }
     // check for index2 in url
     if (isset($_GET['index2'])) {
         $esIndex2 = $_GET['index2'];
@@ -931,5 +918,15 @@ if (basename($_SERVER['PHP_SELF']) !== 'selectindices.php') {
     if ($maxdepth === "") {
         $maxdepth = Constants::MAXDEPTH;
         createCookie('maxdepth', $maxdepth);
+    }
+    $minhardlinks = (isset($_GET['minhardlinks'])) ? (int) $_GET['minhardlinks'] : getCookie('minhardlinks'); // min hard links
+    if ($minhardlinks === "" || $minhardlinks === 0) {
+        $minhardlinks = getAvgHardlinks($client, $esIndex, $path, $filter, $mtime);
+        createCookie('minhardlinks', $minhardlinks);
+    }
+    $mindupes = (isset($_GET['mindupes'])) ? (int) $_GET['mindupes'] : getCookie('mindupes'); // min dupes
+    if ($mindupes === "" || $mindupes === 0) {
+        $mindupes = getAvgDupes($client, $esIndex, $path, $filter, $mtime);
+        createCookie('mindupes', $mindupes);
     }
 }

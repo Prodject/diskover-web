@@ -18,6 +18,15 @@ require "../src/diskover/Diskover.php";
 <html lang="en">
 
 <head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-148814293-1"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-148814293-1');
+        </script>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,8 +55,8 @@ require "../src/diskover/Diskover.php";
 		</div>
         <div class="row">
             <div class="col-xs-10">
-                <div class="alert alert-dismissible alert-info">
-                    <i class="glyphicon glyphicon-info-sign"></i> <strong>For discussions, questions or feature requests, please ask on <a href="https://groups.google.com/forum/?hl=en#!forum/diskover" target="_blank">Google Group</a>. For any bugs, please submit an issue on <a href="https://github.com/shirosaidev/diskover/issues" target="_blank">GitHub issues</a> page.</strong>
+				<div class="alert alert-dismissible alert-info">
+                    <i class="glyphicon glyphicon-info-sign"></i> For discussions, questions or feature requests, please join the diskover <a href="https://join.slack.com/t/diskoverworkspace/shared_invite/enQtNzQ0NjE1Njk5MjIyLWI4NWQ0MjFhYzQyMTRhMzk4NTQ3YjBlYjJiMDk1YWUzMTZmZjI1MTdhYTA3NzAzNTU0MDc5NDA2ZDI4OWRiMjM" target="_blank">Slack workspace</a> or ask on <a href="https://groups.google.com/forum/?hl=en#!forum/diskover" target="_blank">Google Group</a>. For any bugs, please submit an issue on <a href="https://github.com/shirosaidev/diskover/issues" target="_blank">GitHub issues</a> page.
                 </div>
             </div>
         </div>
@@ -102,6 +111,7 @@ require "../src/diskover/Diskover.php";
 					<code>GET http://localhost:8000/api.php/diskover-2018.01.17/dupessize</code></p>
 					<p>Search index using ES query syntax:<br />
 					<code>GET http://localhost:8000/api.php/diskover-2018.01.17/search?query=extension:png%20AND%20_type:file%20AND%20filesize:>1048576</code></p>
+					<p><strong>For "tags", "dupes" and "search" endpoints, you can set the page number and result size with ex. &page=1 and &size=100. Default is page 1 and size 1000.</strong></p>
 					<br>
 					<h4>Update (with JSON object)</h4>
 					<p>Updating file/directory tags is done with the PUT method. You can send a JSON object in the body. The call returns the number of items affected.<br />
@@ -124,7 +134,7 @@ require "../src/diskover/Diskover.php";
 					<code>{"tag_custom": "version 1", "path_parent": "/Users/shirosai/Downloads", "recursive": "true"}</code></p>
                     <p>Tag directory and all items (files/directories) in directory and all sub dirs with custom tag "version 1" (recursive):<br />
 					<code>PUT http://localhost:8000/api.php/diskover-2018.01.17/tagdir</code></p>
-					<code>{"tag_custom": "version 1", "path_parent": "/Users/shirosai/Downloads", "recursive": "true", "files": "true"}</code></p>
+					<code>{"tag_custom": "version 1", "path_parent": "/Users/shirosai/Downloads", "recursive": "true", "tagfiles": "true"}</code></p>
                     <p>Remove tag from directory and all files in directory (non-recursive):<br />
 					<code>PUT http://localhost:8000/api.php/diskover-2018.01.17/tagdir</code></p>
 					<code>{"tag": "", "path_parent": "/Users/shirosai/Downloads", "tagfiles": "true"}</code></p>
@@ -133,7 +143,7 @@ require "../src/diskover/Diskover.php";
 					<code>{"tag_custom": "", "path_parent": "/Users/shirosai/Downloads", "tagfiles": "true"}</code></p>
                     <p>Remove tag and tag_custom from directory and all items (files/directories) in directory and all sub dirs (recursive):<br />
 					<code>PUT http://localhost:8000/api.php/diskover-2018.01.17/tagdir</code></p>
-					<code>{"tag": "", "tag_custom": "", "path_parent": "/Users/shirosai/Downloads", "recursive": "true"}</code></p>
+					<code>{"tag": "", "tag_custom": "", "path_parent": "/Users/shirosai/Downloads", "recursive": "true", "tagfiles": "true"}</code></p>
 				</div>
 			</div>
 			<div class="col-xs-6">

@@ -1,5 +1,58 @@
 # Diskover Web Change Log
 
+# [1.5.0.8] - 2019-11-16
+### added
+- reduced time to do recursive multi-tagging (bulk updates)
+- non-recursive options to tag button menu
+### changed
+- improved dupes and hardlinks analytics pages
+### fixed
+- dupes and hardlinks analytics pages not using cache
+- multi-tag options not displaying for directories on view info page
+
+# [1.5.0.7] - 2019-09-24
+### changed
+- removed s3 inventory index support (enterprise ver only feature)
+- removed cost per gb (storage costs) index support (enterprise ver only feature)
+
+# [1.5.0.6] - 2019-09-13
+### added
+- page and size url vars for "search" api endpoint
+- can now set ES_HOST, ES_USER, ES_PASS using env var APP_ES_HOST, APP_ES_USER, APP_ES_POST (overrides Constants.php diskover-web config)
+### fixed
+- bug with api query when searching for custom tags
+
+# [1.5.0.5] - 2019-08-16
+### fixed
+- quick search in nav bar for "Untagged + no custom tag" searches
+- api call for endpoint "tags" when searching for untagged and no custom tag
+- cleaned up and improved api.php code
+- added pageination to api.php for "tags" and "dupes" endpoints, ex. use &page=1&size=100
+
+# [1.5.0.4] - 2019-07-24
+### fixed
+- setting mtime filter on filetree page would cause error loading dupes, hardlinks or time change analytics pages
+
+# [1.5.0.3] - 2019-07-20
+### fixed
+- directory command button drop down menu overlay issue when search results row tagged
+- overylay issue with mouse over tool tip for anaytics pages
+- top 50 analytics page percent of total file size percent showing incorrect values/bar sizes
+
+# [1.5.0.2] - 2019-07-03
+### fixed
+- curl api calls redirecting to select indices page
+
+# [1.5.0.1] - 2019-07-02
+### changed
+- ended release candidate (rc) ver
+
+# [1.5.0-rc30] - 2019-07-02
+### changed
+- removed support for qumulo api indices
+### fixed
+- api calls with nginx redirecting to select indices page
+
 # [1.5.0-rc29] - 2019-01-30
 ### added
 - Change % checkbox to Hide fields setting on Admin page

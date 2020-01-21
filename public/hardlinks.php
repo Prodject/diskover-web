@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (C) Chris Park 2017-2018
+Copyright (C) Chris Park 2017-2019
 diskover is released under the Apache 2.0 license. See
 LICENSE for the full license text.
  */
@@ -12,17 +12,21 @@ require "../src/diskover/Auth.php";
 require "../src/diskover/Diskover.php";
 require "d3_inc.php";
 
-$minhardlinks = (int)getCookie('minhardlinks');
-if ($minhardlinks === "" || $minhardlinks === 0) {
-    $minhardlinks = getAvgHardlinks($client, $esIndex, $path, $filter, $mtime);
-}
-
 ?>
 
 	<!DOCTYPE html>
 	<html lang="en">
 
 	<head>
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-148814293-1"></script>
+        <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-148814293-1');
+        </script>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -73,11 +77,11 @@ if ($minhardlinks === "" || $minhardlinks === 0) {
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
-                    <div class="col-xs-4">
-                        <div id="hardlinkscountbarchart" class="hardlinkscountbarchart text-center"></div>
+                    <div class="col-xs-6">
+                        <div id="filesizechart" class="text-center"></div>
                     </div>
-                    <div class="col-xs-8">
-                        <div id="hardlinkscountgraph" class="hardlinkscountgraph text-center"></div>
+                    <div class="col-xs-6">
+                        <div id="hardlinkscountchart" class="text-center"></div>
                     </div>
                 </div>
             </div>

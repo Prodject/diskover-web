@@ -41,8 +41,8 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
     }
 
     // get top 50 directories
-    $totalsize = 0;
-    $totalcount = 0;
+    $totaldirsize = 0;
+    $totaldircount = 0;
 
     $results = [];
     $searchParams = [];
@@ -55,7 +55,7 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
     // Setup search query for directories
     $searchParams['body'] = [
         'size' => 50,
-        '_source' => ['filename', 'path_parent', 'filesize', 'items', 'last_modified', 'costpergb'],
+        '_source' => ['filename', 'path_parent', 'filesize', 'items', 'last_modified'],
         'query' => [
             'bool' => [
                 'must' => [
@@ -96,8 +96,8 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
     $topdirs = $queryResponse['hits']['hits'];
 
     foreach ($topdirs as $key => $value) {
-        $totalsize += $value['_source']['filesize'];
-        $totalcount += $value['_source']['items'];
+        $totaldirsize += $value['_source']['filesize'];
+        $totaldircount += $value['_source']['items'];
     }
 
     // Get search results from Elasticsearch for top 50 files
@@ -111,7 +111,7 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
     // Setup search query for files
     $searchParams['body'] = [
         'size' => 50,
-        '_source' => ['filename', 'path_parent', 'filesize', 'last_modified', 'costpergb'],
+        '_source' => ['filename', 'path_parent', 'filesize', 'last_modified'],
         'query' => [
             'bool' => [
                 'must' => [
@@ -148,9 +148,9 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
     $topfiles = $queryResponse['hits']['hits'];
 
     // calculate total file size
-    $totalsize = 0;
+    $totalfilesize = 0;
     foreach ($topfiles as $key => $value) {
-        $totalsize += $value['_source']['filesize'];
+        $totalfilesize += $value['_source']['filesize'];
     }
 } elseif ($top50type == 'Users' || $top50type == 'Groups') {
 
@@ -209,16 +209,6 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                             'sum' => [
                                 'field' => 'filesize'
                             ]
-                        ],
-                        'avg_cost_per_gb' => [
-                            'avg' => [
-                                'field' => 'costpergb'
-                            ]
-                        ],
-                        'cost_per_gb' => [
-                            'sum' => [
-                                'field' => 'costpergb'
-                            ]
                         ]
                     ]
                 ]
@@ -232,18 +222,16 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
         $topconsumers[] = [
                     "name" => $result['key'],
                     "filecount" => $result['doc_count'],
-                    "filesize" => $result['file_size']['value'],
-                    "avgcostpergb" => $result['avg_cost_per_gb']['value'],
-                    "costpergb" => $result['cost_per_gb']['value']
+                    "filesize" => $result['file_size']['value']
                     ];
     }
 
     // calculate total file size and count
-    $totalsize = 0;
-    $totalcount = 0;
+    $totalusersize = 0;
+    $totalusercount = 0;
     foreach ($topconsumers as $key => $value) {
-        $totalsize += $value['filesize'];
-        $totalcount += $value['filecount'];
+        $totalusersize += $value['filesize'];
+        $totalusercount += $value['filecount'];
     }
 }
 
@@ -251,6 +239,15 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-148814293-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-148814293-1');
+  </script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -273,10 +270,8 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                         <button class="btn btn-default button-largest <?php if ($top50type == 'Largest') { echo "active"; } ?>"> Largest</button>
                         <button class="btn btn-default button-oldest <?php if ($top50type == 'Oldest') { echo "active"; } ?>"> Oldest</button>
                         <button class="btn btn-default button-newest <?php if ($top50type == 'Newest') { echo "active"; } ?>"> Newest</button>
-                        <?php if (!$s3_index) { ?>
                         <button class="btn btn-default button-users <?php if ($top50type == 'Users') { echo "active"; } ?>"> Users</button>
                         <button class="btn btn-default button-groups <?php if ($top50type == 'Groups') { echo "active"; } ?>"> Groups</button>
-                        <?php } ?>
                     </div>
                     <span style="font-size:10px; color:gray;"><i class="glyphicon glyphicon-info-sign"></i> filters on filetree page affect this page</span>
                     <br />
@@ -292,9 +287,6 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                   <th class="text-nowrap">Name</th>
                   <th class="text-nowrap">File Size</th>
                   <th>%  <span style="color:darkgray;font-size: 11px;"><i title="Percentage of total file size this page" class="glyphicon glyphicon-question-sign"></i></span></th>
-                  <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                  <th class="text-nowrap">Cost per GB</th>
-                  <?php } ?>
                   <th class="text-nowrap">Modified (utc)</th>
                   <th class="text-nowrap">Path</th>
               </tr>
@@ -307,10 +299,7 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                     <tr><td class="darken" width="10"><?php echo $n; ?></td>
                         <td class="path"><a href="view.php?id=<?php echo $value['_id'] . '&amp;index=' . $value['_index'] . '&amp;doctype=file'; ?>"><i class="glyphicon glyphicon-file" style="color:#738291;font-size:13px;padding-right:3px;"></i> <?php echo $value['_source']['filename']; ?></a></td>
                         <td class="text-nowrap"><span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($value['_source']['filesize']); ?></span></td>
-                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['_source']['filesize'] / $totalsize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['filesize'] / $totalsize) * 100, 2); ?>%</small></span></td>
-                        <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                        <td class="text-nowrap darken">$ <?php echo number_format(round($value['_source']['costpergb'], 2), 2); ?></td>
-                        <?php } ?>
+                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['_source']['filesize'] / $totalfilesize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['filesize'] / $totalfilesize) * 100, 2); ?>%</small></span></td>
                         <td class="text-nowrap darken"><?php echo $value['_source']['last_modified']; ?></td>
                         <td class="path darken"><a href="<?php echo build_url('path', $value['_source']['path_parent']); ?>"><?php echo $value['_source']['path_parent']; ?></a></td>
                     </tr>
@@ -327,10 +316,8 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                         <button class="btn btn-default button-largest <?php if ($top50type == 'Largest') { echo "active"; } ?>"> Largest</button>
                         <button class="btn btn-default button-oldest <?php if ($top50type == 'Oldest') { echo "active"; } ?>"> Oldest</button>
                         <button class="btn btn-default button-newest <?php if ($top50type == 'Newest') { echo "active"; } ?>"> Newest</button>
-                        <?php if (!$s3_index) { ?>
                         <button class="btn btn-default button-users <?php if ($top50type == 'Users') { echo "active"; } ?>"> Users</button>
                         <button class="btn btn-default button-groups <?php if ($top50type == 'Groups') { echo "active"; } ?>"> Groups</button>
-                        <?php } ?>
                     </div>
                     <br />
                     <h5 style="display: inline;"><span class="text-success bold"><?php echo stripslashes($path); ?></span></h5>
@@ -345,9 +332,6 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                   <th class="text-nowrap">Name</th>
                   <th class="text-nowrap">Size</th>
                   <th>%  <span style="color:darkgray;font-size: 11px;"><i title="Percentage of total file size this page" class="glyphicon glyphicon-question-sign"></i></span></th>
-                  <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                  <th class="text-nowrap">Cost per GB</th>
-                  <?php } ?>
                   <th class="text-nowrap">Items</th>
                   <th>%</th>
                   <th class="text-nowrap">Modified (utc)</th>
@@ -376,12 +360,9 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                         <tr><td class="darken" width="10"><?php echo $n; ?></td>
                             <td class="path"><a href="<?php echo build_url('path', $fullpath); ?>&amp;doctype=directory"><i class="glyphicon glyphicon-folder-close" style="color:#8ACEE9;font-size:13px;padding-right:3px;"></i> <?php echo $filename; ?></a></td>
                             <td class="text-nowrap"><span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($value['_source']['filesize']); ?></span></td>
-                            <td width="15%"><div class="text-right percent" style="max-width:100%; width:<?php echo number_format(($value['_source']['filesize'] / $totalsize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['filesize'] / $totalsize) * 100, 2); ?>%</small></span></td>
-                            <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                            <td class="text-nowrap darken">$ <?php echo number_format(round($value['_source']['costpergb'], 2), 2); ?></td>
-                            <?php } ?>
+                            <td width="15%"><div class="text-right percent" style="max-width:100%; width:<?php echo number_format(($value['_source']['filesize'] / $totaldirsize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['filesize'] / $totaldirsize) * 100, 2); ?>%</small></span></td>
                             <td class="text-nowrap"><?php echo $value['_source']['items']; ?></td>
-                            <td width="15%"><div class="text-right percent" style="max-width:100%; width:<?php echo number_format(($value['_source']['items'] / $totalcount) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['items'] / $totalcount) * 100, 2); ?>%</small></span></td>
+                            <td width="15%"><div class="text-right percent" style="max-width:100%; width:<?php echo number_format(($value['_source']['items'] / $totaldircount) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['_source']['items'] / $totaldircount) * 100, 2); ?>%</small></span></td>
                             <td class="text-nowrap darken"><?php echo $value['_source']['last_modified']; ?></td>
                             <td class="path darken"><a href="<?php echo build_url('path', $value['_source']['path_parent']); ?>"><?php echo $value['_source']['path_parent']; ?></a></td>
                         </tr>
@@ -403,10 +384,6 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                   <th class="text-nowrap"><?php if ($top50type == 'Users') { echo 'Owner'; } else { echo 'Group'; } ?></th>
                   <th class="text-nowrap">Size</th>
                   <th>%</th>
-                  <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                  <th class="text-nowrap">Cost per GB</th>
-                  <th class="text-nowrap">Avg Cost per GB</th>
-                  <?php } ?>
                   <th class="text-nowrap">Items (files)</th>
                   <th>%</th>
               </tr>
@@ -419,13 +396,9 @@ if ($top50type == 'Largest' || $top50type == 'Oldest' || $top50type == 'Newest')
                     <tr><td class="darken" width="10"><?php echo $n; ?></td>
                         <td><i class="glyphicon glyphicon-user" style="color:#D19866; font-size:13px; padding-right:3px;"></i> <a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&<?php if ($top50type == "Users") { echo 'owner'; } else { echo 'group'; } ?>=<?php echo $value['name']; ?>"><?php echo $value['name']; ?></a></td>
                         <td><span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($value['filesize']); ?></span></td>
-                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['filesize'] / $totalsize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['filesize'] / $totalsize) * 100, 2); ?>%</small></span></td>
-                        <?php if (!$s3_index && getCookie('costpergb') > 0) { ?>
-                        <td class="text-nowrap darken">$ <?php echo number_format(round($value['costpergb'], 2), 2); ?></td>
-                        <td class="text-nowrap darken">$ <?php echo number_format(round($value['avgcostpergb'], 2), 2); ?></td>
-                        <?php } ?>
+                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['filesize'] / $totalusersize) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['filesize'] / $totalusersize) * 100, 2); ?>%</small></span></td>
                         <td><?php echo $value['filecount']; ?></td>
-                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['filecount'] / $totalcount) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['filecount'] / $totalcount) * 100, 2); ?>%</small></span></td>
+                        <td width="15%"><div class="percent" style="width:<?php echo number_format(($value['filecount'] / $totalusercount) * 100, 2); ?>%;"></div> <span style="color:gray;"><small><?php echo number_format(($value['filecount'] / $totalusercount) * 100, 2); ?>%</small></span></td>
                     </tr>
                   <?php $n++; }
                    ?>

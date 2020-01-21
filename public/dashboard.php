@@ -400,119 +400,21 @@ if ($esIndex2 != "") {
     $diskspace2_date = $queryResponse['hits']['hits'][0]['_source']['indexing_date'];
 }
 
-if (!$s3_index && !$qumulo_index) {
-    // Get recommended file delete size/count/cost
-    $file_recommended_delete_size = 0;
-    $file_recommended_delete_count = 0;
-    $file_recommended_delete_cost = 0;
-
-    $results = [];
-    $searchParams = [];
-
-    // Setup search query
-    $searchParams['index'] = $esIndex;
-    $searchParams['type']  = "file";
-
-    $searchParams['body'] = [
-       'size' => 0,
-        'aggs' => [
-          'total_size' => [
-            'sum' => [
-              'field' => 'filesize'
-            ]
-            ],
-            'total_cost' => [
-                'sum' => [
-                  'field' => 'costpergb'
-                ]
-              ]
-        ],
-        'query' => [
-          'query_string' => [
-            'query' => 'last_modified:{* TO now-6M} AND last_access:{* TO now-6M}'
-          ]
-        ]
-    ];
-    $queryResponse = $client->search($searchParams);
-
-    // Get total count of recommended files to remove
-    $file_recommended_delete_count = $queryResponse['hits']['total'];
-
-    // Get total size of all recommended files to remove
-    $file_recommended_delete_size = $queryResponse['aggregations']['total_size']['value'];
-
-    // Get total cost of all recommended files to remove
-    $file_recommended_delete_cost = $queryResponse['aggregations']['total_cost']['value'];
-}
-
-// Get search results from Elasticsearch for cost per gb
-if (!$s3_index) {
-    $results = [];
-    $searchParams = [];
-
-    // Setup search query
-    $searchParams['index'] = $esIndex;
-    $searchParams['type']  = 'file';
-
-    $searchParams['body'] = [
-        'size' => 0,
-        'query' => [
-            'match_all' => (object) []
-        ],
-        'aggs' => [
-            'avg_cost_per_gb' => [
-                'avg' => [
-                    'field' => 'costpergb'
-                ]
-            ],
-            'cost_per_gb' => [
-                'sum' => [
-                    'field' => 'costpergb'
-                ]
-            ]
-        ]
-    ];
-    $queryResponse = $client->search($searchParams);
-
-    $costpergb = $queryResponse['aggregations']['cost_per_gb']['value'];
-    $avgcostpergb = $queryResponse['aggregations']['avg_cost_per_gb']['value'];
-
-    createCookie('costpergb', $costpergb);
-}
-
-// Get s3 bucket names
-if ($s3_index) {
-    $buckets = [];
-
-    $results = [];
-    $searchParams = [];
-
-    // Setup search query
-    $searchParams['index'] = $esIndex;
-    $searchParams['type']  = "directory";
-
-    $searchParams['body'] = [
-       'size' => 100,
-        'query' => [
-          'query_string' => [
-            'query' => 'path_parent:\/s3'
-          ]
-        ]
-    ];
-    $queryResponse = $client->search($searchParams);
-
-    // Get total count of buckets
-    $bucketcount = $queryResponse['hits']['total'];
-
-    $buckets = $queryResponse['hits']['hits'];
-}
-
 $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-148814293-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-148814293-1');
+</script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -629,11 +531,10 @@ $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
       <div class="jumbotron">
         <h1><i class="glyphicon glyphicon-hdd"></i> Space Savings</h1>
         <p>You could free up <span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($totalFilesizeAll); ?></span> if you delete or archive all your files. 
-<?php if (!$s3_index && !$qumulo_index) { ?>diskover found <span style="font-weight:bold;color:#D20915;"><?php echo number_format($file_recommended_delete_count) ?></span> (<span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($file_recommended_delete_size) ?></span>) <?php if (!$s3_index && $costpergb > 0) { echo "($ " . number_format($file_recommended_delete_cost, 2) . ")"; } ?> <a href="advanced.php?index=<?php echo $esIndex ?>&amp;index2=<?php echo $esIndex2 ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=now-6M&amp;last_access_time_high=now-6M&amp;doctype=file">recommended files</a> to remove.</p>
-                <?php if (!$s3_index && $costpergb > 0) { ?><?php echo '<p>Cost per GB: $ ' . number_format(round($costpergb, 2), 2) . ' total cost, $ ' . number_format(round($avgcostpergb, 2), 2) , ' average per file.</p>'; } ?>
-                <p><span style="font-size:12px;color:#666;"><i class="glyphicon glyphicon-info-sign"></i> Does not account for hardlink sizes. Recommended files is based on >6M mtime &amp; atime.</span><?php } ?></p>
+        diskover found <span style="font-weight:bold;color:#D20915;"><?php echo number_format($file_recommended_delete_count) ?></span> (<span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($file_recommended_delete_size) ?></span>) <a href="advanced.php?index=<?php echo $esIndex ?>&amp;index2=<?php echo $esIndex2 ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=now-6M&amp;last_access_time_high=now-6M&amp;doctype=file">recommended files</a> to remove.</p>
+        <p><span style="font-size:12px;color:#666;"><i class="glyphicon glyphicon-info-sign"></i> Does not account for hardlink sizes. Recommended files is based on >6M mtime &amp; atime.</span></p>
         <p><span class="label label-default"><i class="glyphicon glyphicon-file" style="color:#738291;font-weight:bold;"></i> <span style="color:lightgray">Files</span> <?php echo number_format($totalfiles); ?></span> &nbsp; <span class="label label-default"><i class="glyphicon glyphicon-folder-close" style="color:skyblue;font-weight:bold;"></i> <span style="color:lightgray">Directories</span> <?php echo number_format($totaldirs); ?></span> &nbsp;
-            <?php if (!$s3_index) { ?><span class="label label-default"><i class="glyphicon glyphicon-duplicate" style="color:#738291;font-weight:bold;"></i> <span style="color:lightgray">Dupes</span> <?php echo number_format($totalDupes); ?> (<?php echo formatBytes($totalFilesizeDupes); ?>)</span> &nbsp; <span class="label label-default"><i class="glyphicon glyphicon-link" style="color:#738291;font-weight:bold;"></i> <span style="color:lightgray">Hardlink files</span> <?php echo number_format($totalHardlinkFiles); ?> (<?php echo formatBytes($totalFilesizeHardlinkFiles); ?>)</span><?php } ?></p>
+        <span class="label label-default"><i class="glyphicon glyphicon-duplicate" style="color:#738291;font-weight:bold;"></i> <span style="color:lightgray">Dupes</span> <?php echo number_format($totalDupes); ?> (<?php echo formatBytes($totalFilesizeDupes); ?>)</span> &nbsp; <span class="label label-default"><i class="glyphicon glyphicon-link" style="color:#738291;font-weight:bold;"></i> <span style="color:lightgray">Hardlink files</span> <?php echo number_format($totalHardlinkFiles); ?> (<?php echo formatBytes($totalFilesizeHardlinkFiles); ?>)</span></p>
       </div>
       <div class="panel panel-default chartbox">
         <div class="panel-heading"><h3 class="panel-title" style="display:inline;"><i class="glyphicon glyphicon-dashboard"></i> Crawl Stats</h3><small>&nbsp;&nbsp;&nbsp;&nbsp;<a href="crawlstats.php?<?php echo $_SERVER['QUERY_STRING']; ?>">View more</a></small></div>
@@ -686,7 +587,7 @@ $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
       </div>
     </div>
       <?php
-      if ($totalDupes === 0 && $s3_index != '1') {
+      if ($totalDupes === 0) {
       ?>
       <div class="alert alert-dismissible alert-info">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -697,7 +598,7 @@ $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
       }
       ?>
       <?php
-      if ($totalDupes > 0 && $s3_index != '1') {
+      if ($totalDupes > 0) {
       ?>
       <div class="alert alert-dismissible alert-info">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -731,14 +632,6 @@ $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
     </div>
     <div class="col-xs-6">
         <div class="panel panel-default">
-          <?php if ($s3_index) { ?>
-          <div class="panel-heading"><h3 class="panel-title" style="display:inline;"><i class="glyphicon glyphicon-cloud" style="color:#FD9827;"></i> S3 Overview</h3></div>
-          <div class="panel-body">
-            <p>Buckets: <span class="text-success"><strong><?php $i = 0; while ( $i < sizeof($buckets) ) { { echo '<i class="glyphicon glyphicon-cloud-upload" style="color:#FD9827;"></i> ' . $buckets[$i]['_source']['filename']; if ($i<sizeof($buckets)-1) { echo '&nbsp; '; }; $i++; } } ?></strong></span><br />
-            Bucket Count: <span class="text-success"><strong><?php echo $bucketcount; ?></strong></span><br />
-            diskover S3 root path: <span class="text-success"><strong><?php echo $diskspace_path; ?></strong></span><br />
-            Total Buckets Size: <span style="font-weight:bold;color:#D20915;"><?php echo formatBytes($totalFilesizeAll); ?></span></p>
-          <?php } else { ?>
           <div class="panel-heading"><h3 class="panel-title" style="display:inline;"><i class="glyphicon glyphicon-eye-open"></i> Disk Space Overview</h3></div>
           <div class="panel-body">
           <p>Path: <span style class="text-success"><strong><?php echo $diskspace_path; ?></strong></span></p>
@@ -760,7 +653,6 @@ $estime = number_format(microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"], 4);
             <?php } else if ((($diskspace_used / $diskspace_total) * 100) >= 90) { ?>
             <br /><span class="label label-danger"><i class="glyphicon glyphicon-warning-sign"></i> Used disk space is above 90%</span>
             <?php } ?>
-        <?php } ?>
         </div>
         </div>
         <div class="row">
@@ -1370,19 +1262,15 @@ echo "ES Process Time: {$estime}, Process Time: {$time}";
 ?>
 </p>
 
-<div id="statsModal" class="modal fade" role="dialog">
+<div id="entModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Send anonymous stats to the diskover developer</h4>
+        <h4 class="modal-title">Are you a business? Consider using diskover enterprise.</h4>
       </div>
       <div class="modal-body">
-        <p>Allow usage statistics to be sent to the diskover developer to help improve the product. You can change this later from admin page.</p>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="sendstats" onclick="sendStats();">
-            <label class="form-check-label" for="sendstats">Allow limited anonymous usage stats</label>
-        </div>
+        <p>If you are a business and looking for more advanced features, please consider purchasing diskover enterprise. You can find out more information at <a target="_blank" href="https://diskoverspace.com">https://diskoverspace.com</a>.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -1400,7 +1288,7 @@ echo "ES Process Time: {$estime}, Process Time: {$time}";
         <h4 class="modal-title">Support the development of diskover</h4>
       </div>
       <div class="modal-body">
-        <p><i class="glyphicon glyphicon-bullhorn"></i> Welcome to diskover-web! If you are using diskover in a commercial environment or just want to help advance the software, please become a patron on <a target="_blank" href="https://www.patreon.com/diskover">Patreon</a> or donate on <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CLF223XAS4W72" target="_blank">PayPal</a>. <span style="color:#D01020;"><i class="glyphicon glyphicon-heart-empty"></i></span></p>
+        <p><i class="glyphicon glyphicon-bullhorn"></i> Welcome to diskover-web! To help us keep developing and improving diskover, please consider becoming a Patron on <a target="_blank" href="https://www.patreon.com/shirosaidev">Patreon</a> or donate on <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=CLF223XAS4W72" target="_blank">PayPal</a>. <span style="color:#D01020;"><i class="glyphicon glyphicon-heart-empty"></i></span></p>
         <div class="form-check">
             <input type="checkbox" class="form-check-input" id="sponsoring" onclick="sponsoring();">
             <label class="form-check-label" for="sponsor">I'm already supporting</label>
@@ -1415,14 +1303,6 @@ echo "ES Process Time: {$estime}, Process Time: {$time}";
 </div>
 
 <script>
-// set cookie for sending anonymous stats
-function sendStats() {
-    if (document.getElementById('sendstats').checked) {
-        setCookie('sendstats', 1);
-    } else {
-        setCookie('sendstats', 0);
-    }
-}
 // set cookie for sponsoring
 function sponsoring() {
     if (document.getElementById('sponsoring').checked) {
@@ -1432,10 +1312,9 @@ function sponsoring() {
     }
 }
 $(window).on('load',function(){
-    if (getCookie('sendstats') == '') {
-      setCookie('sendstats', 1);
-      document.getElementById('sendstats').checked = true;
-      $('#statsModal').modal('show');
+    if (getCookie('enterprise') == '') {
+      setCookie('enterprise', 1, 7);
+      $('#entModal').modal('show');
     }
     if (getCookie('support') == '' && getCookie('sponsoring') != 1) {
       setCookie('support', 1, 7);
@@ -1443,8 +1322,6 @@ $(window).on('load',function(){
     }
 });
 </script>
-
-<?php require "logform.php"; ?>
 
 </body>
 </html>

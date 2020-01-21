@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright (C) Chris Park 2017-2018
+Copyright (C) Chris Park 2017-2019
 diskover is released under the Apache 2.0 license. See
 LICENSE for the full license text.
  */
@@ -12,6 +12,9 @@ require "../src/diskover/Diskover.php";
 require "d3_inc.php";
 
 $mindupes = $_GET['mindupes'];
+
+// get mtime in ES format
+$mtime = getmtime($mtime);
 
 // Get search results from Elasticsearch for duplicate files
 
@@ -52,7 +55,7 @@ $searchParams['body'] = [
           'top_dupes' => [
               'terms' => [
                   'field' => 'dupe_md5',
-                  'size' => 100
+                  'size' => 50
               ]
           ]
       ]
@@ -83,7 +86,7 @@ $searchParams['type']  = 'file';
 
 foreach ($md5s_unique as $key => $value) {
     $searchParams['body'] = [
-        'size' => 100,
+        'size' => 50,
         '_source' => ['filename', 'path_parent'],
             'query' => [
               'bool' => [

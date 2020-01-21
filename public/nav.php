@@ -33,7 +33,7 @@ error_reporting(E_ALL ^ E_NOTICE);
                             <a href="#">Files</a>
                             <ul class="dropdown-menu">
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;doctype=file">Untagged</a></li>
-                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;tag_custom=&quot;&quot;">Untagged + no custom tag</a></li>
+                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;tag_custom=&quot;&quot;&amp;doctype=file">Untagged + no custom tag</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=delete&amp;doctype=file">Tagged delete</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=archive&amp;doctype=file">Tagged archive</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=keep&amp;doctype=file">Tagged keep</a></li>
@@ -43,11 +43,11 @@ error_reporting(E_ALL ^ E_NOTICE);
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>&amp;doctype=file">Last modified >3 months</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=file">Lst modified >6 months</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>&amp;doctype=file">Last modified >1 year</a></li>
-						<?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
+						<li class="divider"></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>&amp;doctype=file">Last accessed >3 months</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=file">Last accessed >6 months</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>&amp;doctype=file">Last accessed >1 year</a></li>
-						<?php } ?><li class="divider"></li>
+						<li class="divider"></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576&amp;doctype=file">Size >1 MB</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=10485760&amp;doctype=file">Size >10 MB</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=26214400&amp;doctype=file">Size >25 MB</a></li>
@@ -56,18 +56,18 @@ error_reporting(E_ALL ^ E_NOTICE);
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=262144000&amp;doctype=file">Size >250 MB</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=524288000&amp;doctype=file">Size >500 MB</a></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576000&amp;doctype=file">Size >1 GB</a></li>
-						<?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
+						<li class="divider"></li>
 						<li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;hardlinks_low=2&amp;doctype=file">Hardlinks >1</a></li>
 						<li><a href="simple.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;q=dupe_md5:(NOT &quot;&quot;)&amp;doctype=file">Duplicate files</a></li>
                         <li class="divider"></li>
-                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=file">Recommended files to remove</a></li><?php } ?>
+                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=file">Recommended files to remove</a></li>
                     </ul>
                 </li>
                 <li class="dropdown-submenu">
                     <a tabindex="-1" href="#">Directories</a>
                     <ul class="dropdown-menu">
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;doctype=directory"">Untagged</a></li>
-                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;tag_custom=&quot;&quot;">Untagged + no custom tag</a></li>
+                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=&quot;&quot;&amp;tag_custom=&quot;&quot;&amp;doctype=directory">Untagged + no custom tag</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=delete&amp;doctype=directory">Tagged delete</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=archive&amp;doctype=directory">Tagged archive</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;tag=keep&amp;doctype=directory">Tagged keep</a></li>
@@ -77,10 +77,10 @@ error_reporting(E_ALL ^ E_NOTICE);
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>&amp;doctype=directory">Last modified >3 months</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=directory">Lst modified >6 months</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>&amp;doctype=directory">Last modified >1 year</a></li>
-                        <?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
+                        <li class="divider"></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>&amp;doctype=directory">Last accessed >3 months</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=directory">Last accessed >6 months</a></li>
-                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>&amp;doctype=directory">Last accessed >1 year</a></li><?php } ?>
+                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>&amp;doctype=directory">Last accessed >1 year</a></li>
                         <li class="divider"></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576&amp;doctype=directory">Size >1 MB</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=10485760&amp;doctype=directory">Size >10 MB</a></li>
@@ -90,8 +90,8 @@ error_reporting(E_ALL ^ E_NOTICE);
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=262144000&amp;doctype=directory">Size >250 MB</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=524288000&amp;doctype=directory">Size >500 MB</a></li>
                         <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576000&amp;doctype=directory">Size >1 GB</a></li>
-                        <?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
-                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=directory">Recommended directories to remove</a></li><?php } ?>
+                        <li class="divider"></li>
+                        <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;doctype=directory">Recommended directories to remove</a></li>
                     </ul>
                 </li>
                 <li class="dropdown-submenu">
@@ -108,11 +108,11 @@ error_reporting(E_ALL ^ E_NOTICE);
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>">Last modified >3 months</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>">Lst modified >6 months</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>">Last modified >1 year</a></li>
-                    <?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
+                    <li class="divider"></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-3 months ")); ?>">Last accessed >3 months</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>">Last accessed >6 months</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-12 months ")); ?>">Last accessed >1 year</a></li>
-                    <?php } ?><li class="divider"></li>
+                    <li class="divider"></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576">Size >1 MB</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=10485760">Size >10 MB</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=26214400">Size >25 MB</a></li>
@@ -121,11 +121,11 @@ error_reporting(E_ALL ^ E_NOTICE);
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=26214400">Size >250 MB</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=524288000">Size >500 MB</a></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;file_size_bytes_low=1048576000">Size >1 GB</a></li>
-                    <?php if (!$s3_index && !$qumulo_index) { ?><li class="divider"></li>
+                    <li class="divider"></li>
                     <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;hardlinks_low=2">Hardlinks >1</a></li>
                     <li><a href="simple.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;q=dupe_md5:(NOT &quot;&quot;)">Duplicate files</a></li>
                     <li class="divider"></li>
-                    <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>">Recommended to remove</a></li><?php } ?>
+                    <li><a href="advanced.php?index=<?php echo $esIndex; ?>&amp;index2=<?php echo $esIndex2; ?>&amp;submitted=true&amp;p=1&amp;last_mod_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>&amp;last_access_time_high=<?php echo gmdate("Y-m-d\TH:i:s", strtotime("-6 months ")); ?>">Recommended to remove</a></li>
                 </ul>
             </li>
                     </ul>
@@ -139,13 +139,13 @@ error_reporting(E_ALL ^ E_NOTICE);
                         <li><a href="heatmap.php?<?php echo $urlvars; ?>&amp;maxdepth=<?php echo $maxdepth; ?>">Heatmap</a></li>
                         <li><a href="hotdirs.php?<?php echo $urlvars; ?>&amp;maxdepth=<?php echo $maxdepth; ?>">Hot Dirs</a></li>
                         <li><a href="top50.php?<?php echo $urlvars; ?>">Top 50</a></li>
-                        <?php if (!$s3_index) { ?><li><a href="dupes.php?<?php echo $urlvars; ?>">Dupes</a></li><?php } ?>
-                        <?php if (!$s3_index) { ?><li><a href="hardlinks.php?<?php echo $urlvars; ?>">Hardlinks</a></li><?php } ?>
+                        <li><a href="dupes.php?<?php echo $urlvars; ?>&amp;mindupes=<?php echo $mindupes; ?>">Dupes</a></li>
+                        <li><a href="hardlinks.php?<?php echo $urlvars; ?>&amp;minhardlinks=<?php echo $minhardlinks; ?>">Hardlinks</a></li>
                         <li><a href="tags.php?<?php echo $urlvars; ?>">Tags</a></li>
                         <li><a href="timechange.php?<?php echo $urlvars; ?>">Time Change</a></li>
                         <li class="divider"></li>
                         <li><a href="smartsearches.php?<?php echo $urlvars; ?>">Smart Searches</a></li>
-                        <?php if (!$s3_index) { ?><li><a href="crawlstats.php?<?php echo $urlvars; ?>">Crawl Stats</a></li><?php } ?>
+                        <li><a href="crawlstats.php?<?php echo $urlvars; ?>">Crawl Stats</a></li>
 					</ul>
 				</li>
 			</ul>
